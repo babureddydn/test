@@ -64,10 +64,10 @@ public class Misc implements Runnable {
     @Override
     public void run() {
         try {
-        	long startTime = System.currentTimeMillis();
+        	long startTime = System.nanoTime();
             retrieveBinaryData(url);
-        	long endTime = System.currentTimeMillis();
-			System.out.println("Time taken:" + (endTime - startTime) + " ms");
+        	long endTime = System.nanoTime();
+			System.out.println("Time taken:" + (endTime - startTime) + " ns");
         } catch (IOException e) {
             e.printStackTrace();
         }

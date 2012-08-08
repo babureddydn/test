@@ -1,7 +1,6 @@
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -13,12 +12,7 @@ public class Misc implements Runnable {
         url = u;
     }
     public static void main(String[] args)throws Exception{
-        System.out.println(ManagementFactory.getRuntimeMXBean().getName());
-        for(int i=0;i<1;i++){
-            System.out.print(i + " ");
-            new Thread(new Misc("http://www.google.com/")).start();
-//            Thread.sleep(100);
-        }
+        new Thread(new Misc("http://www.google.com/")).start();
     }
     private static void retrieveBinaryData(String targetUrl) throws IOException {
         URL url;
@@ -27,7 +21,6 @@ public class Misc implements Runnable {
         byte []imageBytes;
         int initialSizeLimit = 2000;
         int nextSizeLimit = 2000;
-        GrowingByteBuffer gbb = new GrowingByteBuffer(initialSizeLimit,nextSizeLimit);
         try {
             url = new URL(targetUrl);
             urlConnection = url.openConnection();
@@ -39,19 +32,9 @@ public class Misc implements Runnable {
 
             imageBytes = new byte[initialSizeLimit];
             dataInputStream = new DataInputStream(urlConnection.getInputStream());
-            System.out.println(i++);
-//            Thread.sleep(1000000);
 
-            boolean done = false;
-            int noOfBytesRead;
-             while(!done) {
-                noOfBytesRead  = dataInputStream.read(imageBytes, 0,nextSizeLimit);
-                if(noOfBytesRead <= 0) {
-                    done = true;
-                }else{
-                    gbb.append(imageBytes, noOfBytesRead);
-                }
-
+             while(dataInputStream.available()>0) {
+                dataInputStream.read(imageBytes, 0,nextSizeLimit);
             }
         }catch (Exception e) {
             e.printStackTrace();
@@ -81,7 +64,10 @@ public class Misc implements Runnable {
     @Override
     public void run() {
         try {
+        	long startTime = System.currentTimeMillis();
             retrieveBinaryData(url);
+        	long endTime = System.currentTimeMillis();
+			System.out.println("Time taken:" + (endTime - startTime) + " ms");
         } catch (IOException e) {
             e.printStackTrace();
         }
